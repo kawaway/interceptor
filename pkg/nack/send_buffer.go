@@ -99,3 +99,14 @@ func (s *sendBuffer) get(seq uint16) *retainablePacket {
 	}
 	return pkt
 }
+
+func (s *sendBuffer) release() {
+	s.m.RLock()
+	defer s.m.RUnlock()
+
+	for i := 0; i < int(s.size); i++ {
+		if s.packets[i] != nil {
+			s.packets[i].Release()
+		}
+	}
+}

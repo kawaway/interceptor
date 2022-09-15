@@ -119,6 +119,10 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 // UnbindLocalStream is called when the Stream is removed. It can be used to clean up any data related to that track.
 func (n *ResponderInterceptor) UnbindLocalStream(info *interceptor.StreamInfo) {
 	n.streamsMu.Lock()
+	stream, ok := n.streams[info.SSRC]
+	if ok {
+		stream.sendBuffer.release()
+	}
 	delete(n.streams, info.SSRC)
 	n.streamsMu.Unlock()
 }
