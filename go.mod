@@ -8,3 +8,5 @@ require (
 	github.com/pion/rtp v1.7.13
 	github.com/stretchr/testify v1.7.1
 )
+
+replace github.com/kawaway/interceptor v0.1.11 => github.com/kawaway/interceptor v0.0.2
