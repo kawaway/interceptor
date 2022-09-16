@@ -39,27 +39,28 @@ func newSendBuffer(size uint16) (*sendBuffer, error) {
 	}, nil
 }
 
-func (s *sendBuffer) add(packet *retainablePacket) {
+func (s *sendBuffer) add(packet *retainablePacket) bool {
 	s.m.Lock()
 	defer s.m.Unlock()
 
+	remain := false
 	seq := packet.Header().SequenceNumber
 	if !s.started {
 		s.packets[seq%s.size] = packet
 		s.lastAdded = seq
 		s.started = true
-		return
+		return remain
 	}
 
 	diff := seq - s.lastAdded
 	if diff == 0 {
-		return
+		return remain
 	} else if diff < uint16SizeHalf {
 		for i := s.lastAdded + 1; i != seq; i++ {
 			idx := i % s.size
 			prevPacket := s.packets[idx]
 			if prevPacket != nil {
-				prevPacket.Release()
+				remain = remain || prevPacket.Release()
 			}
 			s.packets[idx] = nil
 		}
@@ -68,10 +69,11 @@ func (s *sendBuffer) add(packet *retainablePacket) {
 	idx := seq % s.size
 	prevPacket := s.packets[idx]
 	if prevPacket != nil {
-		prevPacket.Release()
+		remain = remain || prevPacket.Release()
 	}
 	s.packets[idx] = packet
 	s.lastAdded = seq
+	return remain
 }
 
 func (s *sendBuffer) get(seq uint16) *retainablePacket {
@@ -100,13 +102,15 @@ func (s *sendBuffer) get(seq uint16) *retainablePacket {
 	return pkt
 }
 
-func (s *sendBuffer) release() {
+func (s *sendBuffer) release() bool {
 	s.m.RLock()
 	defer s.m.RUnlock()
-
+	remain := false
 	for i := 0; i < int(s.size); i++ {
 		if s.packets[i] != nil {
-			s.packets[i].Release()
+			remain = remain || s.packets[i].Release()
+			s.packets[i] = nil
 		}
 	}
+	return remain
 }

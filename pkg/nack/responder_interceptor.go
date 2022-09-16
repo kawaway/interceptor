@@ -111,7 +111,9 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 		if err != nil {
 			return 0, err
 		}
-		sendBuffer.add(pkt)
+		if remain := sendBuffer.add(pkt); remain {
+			n.log.Warn("`sendBuffer.add` count is not 0 yet")
+		}
 		return writer.Write(header, payload, attributes)
 	})
 }
@@ -121,7 +123,9 @@ func (n *ResponderInterceptor) UnbindLocalStream(info *interceptor.StreamInfo) {
 	n.streamsMu.Lock()
 	stream, ok := n.streams[info.SSRC]
 	if ok {
-		stream.sendBuffer.release()
+		if remain := stream.sendBuffer.release(); remain {
+			n.log.Warn("`sendBuffer.release` count is not 0 yet")
+		}
 	}
 	delete(n.streams, info.SSRC)
 	n.streamsMu.Unlock()
@@ -141,7 +145,7 @@ func (n *ResponderInterceptor) resendPackets(nack *rtcp.TransportLayerNack) {
 				if _, err := stream.rtpWriter.Write(p.Header(), p.Payload(), interceptor.Attributes{}); err != nil {
 					n.log.Warnf("failed resending nacked packet: %+v", err)
 				}
-				p.Release()
+				_ = p.Release()
 			}
 
 			return true

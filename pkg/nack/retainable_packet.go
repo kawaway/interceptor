@@ -114,16 +114,19 @@ func (p *retainablePacket) Retain() error {
 	return nil
 }
 
-func (p *retainablePacket) Release() {
+func (p *retainablePacket) Release() bool {
 	p.countMu.Lock()
 	defer p.countMu.Unlock()
 	p.count--
 
+	remain := true
 	if p.count == 0 {
 		// release back to pool
 		p.onRelease(p.header, p.buffer)
 		p.header = nil
 		p.buffer = nil
 		p.payload = nil
+		remain = false
 	}
+	return remain
 }
