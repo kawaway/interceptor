@@ -111,6 +111,9 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 		if err != nil {
 			return 0, err
 		}
+		if _, ok := n.streams[info.SSRC]; !ok {
+			n.log.Errorf("NewPacket after release ssrc:%v", info.SSRC)
+		}
 		if remain := sendBuffer.add(pkt); remain {
 			n.log.Warn("`sendBuffer.add` count is not 0 yet")
 		}
@@ -121,6 +124,7 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 // UnbindLocalStream is called when the Stream is removed. It can be used to clean up any data related to that track.
 func (n *ResponderInterceptor) UnbindLocalStream(info *interceptor.StreamInfo) {
 	n.streamsMu.Lock()
+	n.log.Infof("`UnbindLocalStream` in nack ssrc:%v", info.SSRC)
 	stream, ok := n.streams[info.SSRC]
 	if ok {
 		if remain := stream.sendBuffer.release(); remain {
