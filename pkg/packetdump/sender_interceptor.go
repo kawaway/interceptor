@@ -1,7 +1,7 @@
 package packetdump
 
 import (
-	"github.com/pion/interceptor"
+	"github.com/kawaway/interceptor"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
 )

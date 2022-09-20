@@ -1,7 +1,7 @@
 package packetdump
 
 import (
-	"github.com/pion/interceptor"
+	"github.com/kawaway/interceptor"
 )
 
 // ReceiverInterceptorFactory is a interceptor.Factory for a ReceiverInterceptor

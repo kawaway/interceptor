@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/pion/interceptor"
+	"github.com/kawaway/interceptor"
 	"github.com/pion/logging"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"

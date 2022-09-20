@@ -3,8 +3,8 @@
 package cc
 
 import (
-	"github.com/pion/interceptor"
-	"github.com/pion/interceptor/pkg/gcc"
+	"github.com/kawaway/interceptor"
+	"github.com/kawaway/interceptor/pkg/gcc"
 	"github.com/pion/logging"
 	"github.com/pion/rtcp"
 )
