@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/pion/interceptor/internal/cc"
+	"github.com/kawaway/interceptor/internal/cc"
 )
 
 type rttEstimator struct {

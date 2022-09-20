@@ -3,7 +3,7 @@ package gcc
 import (
 	"time"
 
-	"github.com/pion/interceptor/internal/cc"
+	"github.com/kawaway/interceptor/internal/cc"
 )
 
 type rateCalculator struct {
