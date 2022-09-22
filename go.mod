@@ -8,5 +8,3 @@ require (
 	github.com/pion/rtp v1.7.13
 	github.com/stretchr/testify v1.7.1
 )
-
-replace github.com/pion/interceptor => ./
