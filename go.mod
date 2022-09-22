@@ -10,4 +10,4 @@ require (
 	github.com/stretchr/testify v1.7.1
 )
 
-replace github.com/pion/interceptor => ./
+replace github.com/pion/interceptor v0.1.1 => github.com/kawaway/interceptor v0.0.0
