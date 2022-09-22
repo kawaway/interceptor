@@ -103,7 +103,7 @@ func (p *retainablePacket) Payload() []byte {
 	return p.payload
 }
 
-func (p *retainablePacket) Retain() error {
+func (p *retainablePacket) Retain(finished bool) error {
 	p.countMu.Lock()
 	defer p.countMu.Unlock()
 	if p.count == 0 {
@@ -111,6 +111,9 @@ func (p *retainablePacket) Retain() error {
 		return errPacketReleased
 	}
 	p.count++
+	if finished {
+		return errRetainAfterFinished
+	}
 	return nil
 }
 

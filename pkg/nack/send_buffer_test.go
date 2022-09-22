@@ -3,16 +3,18 @@ package nack
 import (
 	"testing"
 
+	"github.com/pion/logging"
 	"github.com/pion/rtp"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSendBuffer(t *testing.T) {
 	pm := newPacketManager()
+	log := logging.NewDefaultLoggerFactory().NewLogger("nack_responder")
 	for _, start := range []uint16{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 511, 512, 513, 32767, 32768, 32769, 65527, 65528, 65529, 65530, 65531, 65532, 65533, 65534, 65535} {
 		start := start
 
-		sb, err := newSendBuffer(8)
+		sb, err := newSendBuffer(8, log)
 		require.NoError(t, err)
 
 		add := func(nums ...uint16) {
@@ -73,7 +75,8 @@ func TestSendBuffer(t *testing.T) {
 func TestSendBuffer_Overridden(t *testing.T) {
 	// override original packet content and get
 	pm := newPacketManager()
-	sb, err := newSendBuffer(1)
+	log := logging.NewDefaultLoggerFactory().NewLogger("nack_responder")
+	sb, err := newSendBuffer(1, log)
 	require.NoError(t, err)
 	require.Equal(t, uint16(1), sb.size)
 
@@ -104,10 +107,12 @@ func TestSendBuffer_Overridden(t *testing.T) {
 //     go test -race ./pkg/nack/
 func TestSendBuffer_Race(t *testing.T) {
 	pm := newPacketManager()
+	log := logging.NewDefaultLoggerFactory().NewLogger("nack_responder")
+
 	for _, start := range []uint16{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 511, 512, 513, 32767, 32768, 32769, 65527, 65528, 65529, 65530, 65531, 65532, 65533, 65534, 65535} {
 		start := start
 
-		sb, err := newSendBuffer(8)
+		sb, err := newSendBuffer(8, log)
 		require.NoError(t, err)
 
 		add := func(nums ...uint16) {

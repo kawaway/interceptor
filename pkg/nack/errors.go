@@ -6,6 +6,7 @@ import "errors"
 var ErrInvalidSize = errors.New("invalid buffer size")
 
 var (
+	errRetainAfterFinished     = errors.New("Retain after finished")
 	errPacketReleased          = errors.New("could not retain packet, already released")
 	errFailedToCastHeaderPool  = errors.New("could not access header pool, failed cast")
 	errFailedToCastPayloadPool = errors.New("could not access payload pool, failed cast")

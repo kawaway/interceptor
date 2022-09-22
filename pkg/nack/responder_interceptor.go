@@ -36,7 +36,7 @@ func (r *ResponderInterceptorFactory) NewInterceptor(id string) (interceptor.Int
 		i.packetFactory = newPacketManager()
 	}
 
-	if _, err := newSendBuffer(i.size); err != nil {
+	if _, err := newSendBuffer(i.size, i.log); err != nil {
 		return nil, err
 	}
 
@@ -101,7 +101,7 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 	}
 
 	// error is already checked in NewGeneratorInterceptor
-	sendBuffer, _ := newSendBuffer(n.size)
+	sendBuffer, _ := newSendBuffer(n.size, n.log)
 	n.streamsMu.Lock()
 	n.streams[info.SSRC] = &localStream{sendBuffer: sendBuffer, rtpWriter: writer}
 	n.streamsMu.Unlock()
@@ -111,11 +111,6 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 		if err != nil {
 			return 0, err
 		}
-		n.streamsMu.Lock()
-		if _, ok := n.streams[info.SSRC]; !ok {
-			n.log.Errorf("NewPacket after release ssrc:%v", info.SSRC)
-		}
-		n.streamsMu.Unlock()
 		if remain := sendBuffer.add(pkt); remain {
 			n.log.Warn("`sendBuffer.add` count is not 0 yet")
 		}
@@ -130,7 +125,7 @@ func (n *ResponderInterceptor) UnbindLocalStream(info *interceptor.StreamInfo) {
 	stream, ok := n.streams[info.SSRC]
 	if ok {
 		if remain := stream.sendBuffer.release(); remain {
-			n.log.Warn("`sendBuffer.release` count is not 0 yet")
+			n.log.Error("`sendBuffer.release` count is not 0 yet")
 		}
 	}
 	delete(n.streams, info.SSRC)
