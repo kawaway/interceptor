@@ -111,9 +111,11 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 		if err != nil {
 			return 0, err
 		}
+		n.streamsMu.Lock()
 		if _, ok := n.streams[info.SSRC]; !ok {
 			n.log.Errorf("NewPacket after release ssrc:%v", info.SSRC)
 		}
+		n.streamsMu.Unlock()
 		if remain := sendBuffer.add(pkt); remain {
 			n.log.Warn("`sendBuffer.add` count is not 0 yet")
 		}
@@ -133,6 +135,16 @@ func (n *ResponderInterceptor) UnbindLocalStream(info *interceptor.StreamInfo) {
 	}
 	delete(n.streams, info.SSRC)
 	n.streamsMu.Unlock()
+}
+
+func (n *ResponderInterceptor) UnbindRemoteStream(info *interceptor.StreamInfo) {
+	n.log.Infof("`UnbindRemoteStream` in nack ssrc:%v", info.SSRC)
+}
+
+// Close closes the interceptor.
+func (n *ResponderInterceptor) Close() error {
+	n.log.Info("`ResponderInterceptor.Close`")
+	return nil
 }
 
 func (n *ResponderInterceptor) resendPackets(nack *rtcp.TransportLayerNack) {
