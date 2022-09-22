@@ -1,8 +1,11 @@
 package nack
 
 import (
+	"errors"
 	"fmt"
 	"sync"
+
+	"github.com/pion/logging"
 )
 
 const (
@@ -14,11 +17,12 @@ type sendBuffer struct {
 	size      uint16
 	lastAdded uint16
 	started   bool
-
-	m sync.RWMutex
+	finished  bool
+	log       logging.LeveledLogger
+	m         sync.RWMutex
 }
 
-func newSendBuffer(size uint16) (*sendBuffer, error) {
+func newSendBuffer(size uint16, log logging.LeveledLogger) (*sendBuffer, error) {
 	allowedSizes := make([]uint16, 0)
 	correctSize := false
 	for i := 0; i < 16; i++ {
@@ -36,6 +40,7 @@ func newSendBuffer(size uint16) (*sendBuffer, error) {
 	return &sendBuffer{
 		packets: make([]*retainablePacket, size),
 		size:    size,
+		log:     log,
 	}, nil
 }
 
@@ -43,6 +48,9 @@ func (s *sendBuffer) add(packet *retainablePacket) bool {
 	s.m.Lock()
 	defer s.m.Unlock()
 
+	if s.finished {
+		s.log.Error("sendBuffer add after finised")
+	}
 	remain := false
 	seq := packet.Header().SequenceNumber
 	if !s.started {
@@ -89,13 +97,20 @@ func (s *sendBuffer) get(seq uint16) *retainablePacket {
 		return nil
 	}
 
+	if s.finished {
+		s.log.Error("sendBuffer get after finished")
+	}
+
 	pkt := s.packets[seq%s.size]
 	if pkt != nil {
 		if pkt.Header().SequenceNumber != seq {
 			return nil
 		}
 		// already released
-		if err := pkt.Retain(); err != nil {
+		if err := pkt.Retain(s.finished); err != nil {
+			if errors.Is(err, errRetainAfterFinished) {
+				s.log.Errorf("sendBuffer %v\n", err)
+			}
 			return nil
 		}
 	}
@@ -112,5 +127,6 @@ func (s *sendBuffer) release() bool {
 			s.packets[i] = nil
 		}
 	}
+	s.finished = true
 	return remain
 }
