@@ -9,6 +9,6 @@ require (
 	github.com/stretchr/testify v1.7.1
 )
 
-//replace github.com/pion/interceptor => github.com/kawaway/interceptor v0.0.3-0.20220916093414-9309326299fb
+replace github.com/pion/interceptor => github.com/kawaway/interceptor v0.0.3-0.20220916093414-9309326299fb
 
-//replace github.com/kawaway/interceptor => ./
+replace github.com/kawaway/interceptor => ./
