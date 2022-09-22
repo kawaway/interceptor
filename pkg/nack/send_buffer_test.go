@@ -20,7 +20,7 @@ func TestSendBuffer(t *testing.T) {
 				seq := start + n
 				pkt, err := pm.NewPacket(&rtp.Header{SequenceNumber: seq}, nil)
 				require.NoError(t, err)
-				remain := sb.add(pkt)
+				remain = sb.add(pkt)
 				require.Equal(t, false, remain)
 			}
 		}
@@ -37,8 +37,8 @@ func TestSendBuffer(t *testing.T) {
 				if packet.Header().SequenceNumber != seq {
 					t.Errorf("packet for %d returned with incorrect SequenceNumber: %d", seq, packet.Header().SequenceNumber)
 				}
-				_ = packet.Release()
-				// require.Equal(t, false, remain)
+				remain = packet.Release()
+				require.Equal(t, false, remain)
 			}
 		}
 		assertNOTGet := func(nums ...uint16) {
@@ -66,7 +66,6 @@ func TestSendBuffer(t *testing.T) {
 		add(22)
 		assertGet(22)
 		assertNOTGet(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)
-		sb.release()
 	}
 }
 

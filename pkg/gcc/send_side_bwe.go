@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kawaway/interceptor"
-	"github.com/kawaway/interceptor/internal/cc"
+	"github.com/pion/interceptor"
+	"github.com/pion/interceptor/internal/cc"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
 )

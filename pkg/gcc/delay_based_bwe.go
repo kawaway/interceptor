@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kawaway/interceptor/internal/cc"
+	"github.com/pion/interceptor/internal/cc"
 )
 
 const (

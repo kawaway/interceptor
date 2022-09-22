@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/kawaway/interceptor"
+	"github.com/pion/interceptor"
 	"github.com/pion/rtp"
 )
 

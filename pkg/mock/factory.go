@@ -1,6 +1,6 @@
 package mock
 
-import "github.com/kawaway/interceptor"
+import "github.com/pion/interceptor"
 
 // Factory is a mock Factory for testing.
 type Factory struct {

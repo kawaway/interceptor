@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/kawaway/interceptor"
+	"github.com/pion/interceptor"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
 )

@@ -3,7 +3,7 @@ package twcc
 import (
 	"sync/atomic"
 
-	"github.com/kawaway/interceptor"
+	"github.com/pion/interceptor"
 	"github.com/pion/rtp"
 )
 
