@@ -104,6 +104,7 @@ func (n *ResponderInterceptor) BindLocalStream(info *interceptor.StreamInfo, wri
 	sendBuffer, _ := newSendBuffer(n.size, n.log)
 	n.streamsMu.Lock()
 	n.streams[info.SSRC] = &localStream{sendBuffer: sendBuffer, rtpWriter: writer}
+	n.log.Infof("`BindLocalStream` in nack ssrc:%v", info.SSRC)
 	n.streamsMu.Unlock()
 
 	return interceptor.RTPWriterFunc(func(header *rtp.Header, payload []byte, attributes interceptor.Attributes) (int, error) {
